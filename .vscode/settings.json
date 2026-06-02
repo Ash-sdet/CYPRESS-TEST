@@ -1,0 +1,10 @@
+{
+    "chat.mcp.serverSampling": {
+        "Cypress Test/.vscode/mcp.json: cypress": {
+            "allowedModels": [
+                "copilot/auto",
+                "copilot/claude-haiku-4.5"
+            ]
+        }
+    }
+}
