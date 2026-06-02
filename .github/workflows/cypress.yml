@@ -26,10 +26,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '20'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci --verbose
+
 
       - name: Install latest Cypress
         run: npm install cypress@latest
@@ -40,17 +41,19 @@ jobs:
       - name: Notify Teams on Success
         if: success()
         run: |
-          curl -H "Content-Type: application/json" \
-          -d '{
-            "text":"✅ Cypress Suite Passed\nRepository: '${{ github.repository }}'\nBranch: '${{ github.ref_name }}'"
-          }' \
-          ${{ secrets.TEAMS_WEBHOOK}}
+         curl -X POST \
+         -H "Content-Type: application/json" \
+         -d '{
+          "text":"✅ Cypress Tests Passed\n\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nRun: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+         }' \
+          "${{ secrets.TEAMS_WEBHOOK }}"
 
       - name: Notify Teams on Failure
         if: failure()
         run: |
-          curl -H "Content-Type: application/json" \
-          -d '{
-            "text":"❌ Cypress Suite Failed\nRepository: '${{ github.repository }}'\nBranch: '${{ github.ref_name }}'\nRun: https://github.com/'${{ github.repository }}'/actions/runs/'${{ github.run_id }}''
-          }' \
-          ${{ secrets.TEAMS_WEBHOOK}}
+         curl -X POST \
+         -H "Content-Type: application/json" \
+         -d '{
+         "text":"❌ Cypress Tests Failed\n\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nRun: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+         }' \
+         "${{ secrets.TEAMS_WEBHOOK }}"
