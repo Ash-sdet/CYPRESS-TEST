@@ -54,6 +54,17 @@ jobs:
          curl -X POST \
          -H "Content-Type: application/json" \
          -d '{
-         "text":"❌ Cypress Tests Failed\n\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nRun: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+         "type": "AdaptiveCard",
+         "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+         "version": "1.4",
+         "body": [
+          {
+            "type": "TextBlock",
+            "size": "Large",
+            "weight": "Bolder",
+            "text": "GitHub Actions Test / ❌ Cypress Tests Failed\n\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nRun: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+         ]
+         
          }' \
          "${{ secrets.TEAMS_WEBHOOK }}"
