@@ -1,0 +1,55 @@
+name: Example Workflow
+
+run-name: 'Run triggered by ${{github.event_name}}-${{github.sha}} '
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight
+
+jobs:    
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code code  
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install latest Cypress
+        run: npm install cypress@latest
+
+      - name: Run tests
+        run: npx cypress run   
+
+      - name: Notify Teams on Success
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -d '{
+            "text":"✅ Cypress Suite Passed\nRepository: '${{ github.repository }}'\nBranch: '${{ github.ref_name }}'"
+          }' \
+          ${{ secrets.TEAMS_WEBHOOK}}
+
+      - name: Notify Teams on Failure
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -d '{
+            "text":"❌ Cypress Suite Failed\nRepository: '${{ github.repository }}'\nBranch: '${{ github.ref_name }}'\nRun: https://github.com/'${{ github.repository }}'/actions/runs/'${{ github.run_id }}''
+          }' \
+          ${{ secrets.TEAMS_WEBHOOK}}
